@@ -16,38 +16,37 @@ gulp.task('svg', function () {
 	return gulp.src(join(SRC, "**/*.svg"))
 		.pipe(svgmin({
 			plugins: [{
-				removeTitle: true
+				removeTitle: true // Убираем заголовки
 			}, {
-				removeDesc: true
+				removeDesc: true // и описания
 			}, {
-				sortAttrs: true
+				sortAttrs: true // сортируем аттрибуты для наглядности
 			}, {
-				removeElementsByAttr: true
+				removeStyleElement: true // на всякий случай убираем тэги <style>
 			}, {
-				removeStyleElement: true
-			}, {
-				removeScriptElement: true
+				removeScriptElement: true // и <script>
 			}]
 		}))
-	.pipe(replace(/<path\sd="M0\s0h18v18H0z"\/>/g, ''))
-	.pipe(replace(/<path\sd="M0\s0h24v24H0z"\/>/g, ''))
-	.pipe(replace(/<path\sd="M0\s0h30v30H0z"\/>/g, ''))
-	.pipe(replace(/<path\sd="M0\s0h36v36H0z"\/>/g, ''))
+	.pipe(replace(/<path\sd="M0\s0h18v18H0z"\/>/g, '')) // убираем квадраты из скетча
+	.pipe(replace(/<path\sd="M0\s0h24v24H0z"\/>/g, '')) // которые делают дизайнеры,
+	.pipe(replace(/<path\sd="M0\s0h30v30H0z"\/>/g, '')) // чтобы иконки были одного
+	.pipe(replace(/<path\sd="M0\s0h36v36H0z"\/>/g, '')) // размера
 	.pipe(replace(/<path\sfill="none"\sd="M0\s0h18v18H0z"\/>/g, ''))
 	.pipe(replace(/<path\sfill="none"\sd="M0\s0h24v24H0z"\/>/g, ''))
 	.pipe(replace(/<path\sfill="none"\sd="M0\s0h30v30H0z"\/>/g, ''))
 	.pipe(replace(/<path\sfill="none"\sd="M0\s0h36v36H0z"\/>/g, ''))
-	.pipe(replace(/<g\sfill="#FFF">/g, ''))
-	.pipe(replace(/<g\sfill="none"\sfill-rule="evenodd">/g, ''))
-	.pipe(replace(/<\/g>/g, ''))
-	.pipe(gulpif(/color/, cheerio(function ($) {
-		$('path[fill="#6D7986"]').remove();
-		$('path').attr( "fill", "#FFF" );
+	.pipe(replace(/<g\sfill="#FFF">/g, '')) // убираем группу с фоном
+	.pipe(replace(/<g\sfill="none"\sfill-rule="evenodd">/g, '')) // и с пустой заливкой
+	.pipe(replace(/<\/g>/g, '')) // и их закрывающие тэги
+	.pipe(gulpif(/color/, cheerio(function ($) { // для color картинок
+		$('path[fill="#6D7986"]').remove(); // убираем тэг с фоном, который генерирует скетч
+		$('path').attr( "fill", "#FFF" ); // и даем всем path белую заливку, которую убили выше в группе
 	})))
-	.pipe(insert.append('\n<!-- © 2017 Alfa Laboratory -->'))
+	.pipe(insert.append('\n<!-- © 2017 Alfa Laboratory -->')) // ну и копирайт, конечно
 	.pipe(gulp.dest(DEST));
 });
 
+// Чистим out
 gulp.task("clean", function() {
 	return del(DEST);
 });
